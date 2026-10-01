@@ -92,3 +92,19 @@ def test_empty_and_malformed_rows_are_skipped_not_fatal(client, login):
     report = _upload(client, headers, content).json()
     assert report["skipped"] == 2
     assert report["imported"] == 1
+
+
+def test_duration_boundaries(client, login):
+    """Fractional seconds are kept; negatives and absurd values are skipped."""
+    headers = login("ops1@example.com")
+    content = (
+        b"episode_id,robot_id,task_name,recorded_at,duration_seconds,operator_name,quality\n"
+        b"EP-50010,arm-01,pick cup,2026-08-01T10:00:00,45.5,Aline,good\n"
+        b"EP-50011,arm-01,pick cup,2026-08-01T10:00:00,-5,Aline,good\n"
+        b"EP-50012,arm-01,pick cup,2026-08-01T10:00:00,999999,Aline,good\n"
+    )
+    report = _upload(client, headers, content).json()
+    assert report["imported"] == 1  # 45.5 kept
+    reasons = [r["reason"] for r in report["rows"] if r["action"] == "skipped"]
+    assert any("-5" in r for r in reasons)
+    assert any("999999" in r for r in reasons)

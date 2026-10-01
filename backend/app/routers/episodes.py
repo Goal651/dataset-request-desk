@@ -56,6 +56,9 @@ def parse_quality(raw: str | None) -> EpisodeQuality | None:
         return None
 
 
+MAX_DURATION_SECONDS = 86_400  # recordings are minutes-long; a day is already absurd
+
+
 def parse_duration(raw: str | None) -> float | None:
     text = (raw or "").strip()
     if not text:
@@ -64,7 +67,9 @@ def parse_duration(raw: str | None) -> float | None:
         value = float(text)
     except ValueError:
         return None
-    return value if value >= 0 else None
+    if value < 0 or value > MAX_DURATION_SECONDS:
+        return None
+    return value  # fractional seconds are kept (e.g. 45.5 from frame rounding)
 
 
 @dataclass
