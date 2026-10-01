@@ -4,8 +4,6 @@ from __future__ import annotations
 
 from datetime import date, datetime
 
-from sqlalchemy import update
-
 from app.models import DatasetRequest, RequestStatus, StatusEvent, User
 from app.routers.episodes import import_csv_bytes
 

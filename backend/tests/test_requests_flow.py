@@ -3,11 +3,9 @@
 from __future__ import annotations
 
 import pytest
-
-from sqlalchemy import select
-
 from app.models import Episode
 from app.routers.episodes import import_csv_bytes
+from sqlalchemy import select
 
 
 @pytest.fixture()
@@ -60,11 +58,11 @@ def test_operator_sees_all_requests(client, login, client_request):
 
 def test_happy_path_transition_flow(client, login, client_request):
     request_id = client_request["id"]
-    assert _transition(client, login("ops1@example.com"), request_id, "in_progress").status_code == 200
-    assert _transition(client, login("ops1@example.com"), request_id, "delivered").status_code in (
-        200,
-        409,
-    )  # delivered may fail without enough episodes; asserted separately below
+    started = _transition(client, login("ops1@example.com"), request_id, "in_progress")
+    assert started.status_code == 200
+    # delivered may fail without enough episodes; that rule is asserted separately
+    delivered = _transition(client, login("ops1@example.com"), request_id, "delivered")
+    assert delivered.status_code in (200, 409)
 
 
 def test_delivery_requires_enough_episodes(client, login, client_request):
@@ -90,9 +88,7 @@ def test_client_cannot_move_to_in_progress(client, login, client_request):
 
 def test_reject_then_rework_cycle(client, login, client_request, db_session):
     """Operator delivers, client rejects, operator reworks, re-delivers."""
-    from app.models import Episode, EpisodeQuality
     from app.routers.episodes import import_csv_bytes
-    from sqlalchemy import select
 
     request_id = client_request["id"]
     ops = login("ops1@example.com")
@@ -151,9 +147,7 @@ def test_reject_then_rework_cycle(client, login, client_request, db_session):
 
 def test_accepted_is_terminal(client, login, db_session, client_request):
     """accepted requests cannot move again (also covered indirectly by the map)."""
-    from app.models import Episode
 
-    from sqlalchemy import select
 
     request_id = client_request["id"]
     ops = login("ops1@example.com")

@@ -9,15 +9,12 @@ venv/
 *.egg-info/
 
 # Environment / secrets
-.env
-.env.local
 
 # Frontend
 node_modules/
 frontend/dist/
 
 # Editors / OS
-.vscode/
 .idea/
 .DS_Store
 
@@ -27,3 +24,4 @@ frontend/dist/
 # Local scratch
 episodes_large.csv
 *.log
+config.bat

@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: drd
+          POSTGRES_PASSWORD: drd
+          POSTGRES_DB: drd
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd "pg_isready -U drd"
+          --health-interval 2s
+          --health-timeout 3s
+          --health-retries 20
+    env:
+      DATABASE_URL: postgresql+psycopg://drd:drd@localhost:5433/drd
+      TEST_DATABASE_URL: postgresql+psycopg://drd:drd@localhost:5433/drd_test
+      SEED_CSV_PATH: ${{ github.workspace }}/seed/episodes.csv
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+      - run: pip install -r backend/requirements-dev.txt
+      - name: Lint
+        run: ruff check backend
+      - name: Tests
+        run: pytest backend/tests
+
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install --no-audit --no-fund
+        working-directory: frontend
+      - run: npm run build
+        working-directory: frontend

@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import csv
 import io
-from dataclasses import asdict, dataclass, field
-from datetime import datetime, timedelta, timezone
+from dataclasses import dataclass, field
+from datetime import UTC, datetime, timedelta
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, status
@@ -42,7 +42,7 @@ def parse_timestamp(raw: str) -> datetime | None:
         return None
     for fmt in DATE_FORMATS:
         try:
-            return datetime.strptime(text, fmt).replace(tzinfo=timezone.utc)
+            return datetime.strptime(text, fmt).replace(tzinfo=UTC)
         except ValueError:
             continue
     return None
@@ -100,7 +100,7 @@ def import_csv_bytes(content: bytes, db: Session) -> ImportReport:
     """
     report = ImportReport()
     reader = csv.DictReader(io.StringIO(content.decode("utf-8-sig", errors="replace")))
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     existing: dict[str, Episode] = {e.episode_id: e for e in db.scalars(select(Episode))}
 
     to_upsert: list[tuple[int, str, dict]] = []

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import enum
-from datetime import date, datetime, timezone
+from datetime import UTC, date, datetime
 
 from sqlalchemy import (
     CheckConstraint,
@@ -24,7 +24,7 @@ from app.db import Base
 
 
 def utcnow() -> datetime:
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 class Role(str, enum.Enum):

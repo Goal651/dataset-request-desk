@@ -9,13 +9,12 @@ from pathlib import Path
 os.environ.setdefault("BCRYPT_ROUNDS", "4")
 
 import pytest
-from fastapi.testclient import TestClient
-from sqlalchemy import create_engine, text
-from sqlalchemy.orm import sessionmaker
-
 from app.config import get_settings
 from app.models import Role, User
 from app.security import hash_password
+from fastapi.testclient import TestClient
+from sqlalchemy import create_engine, text
+from sqlalchemy.orm import sessionmaker
 
 settings = get_settings()
 TEST_DB_URL = settings.test_database_url
@@ -118,7 +117,9 @@ def login(client, users):
     """login(email) -> Authorization headers for that seed user."""
 
     def _login_as(email: str) -> dict[str, str]:
-        response = client.post("/auth/login", json={"email": email, "password": SEED_USERS[email][0]})
+        response = client.post(
+            "/auth/login", json={"email": email, "password": SEED_USERS[email][0]}
+        )
         assert response.status_code == 200, response.text
         return {"Authorization": f"Bearer {response.json()['access_token']}"}
 

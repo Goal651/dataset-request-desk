@@ -68,10 +68,8 @@ def require_role(*roles: Role):
     def dependency(user: CurrentUser) -> User:
         allowed = set(roles) | ({Role.admin} if Role.operator in roles else set())
         if user.role not in allowed:
-            raise HTTPException(
-                status.HTTP_403_FORBIDDEN,
-                f"Requires role: {' or '.join(r.value for r in sorted(allowed, key=lambda r: r.value))}",
-            )
+            names = " or ".join(sorted(r.value for r in allowed))
+            raise HTTPException(status.HTTP_403_FORBIDDEN, f"Requires role: {names}")
         return user
 
     return dependency

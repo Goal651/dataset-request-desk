@@ -3,10 +3,8 @@
 from __future__ import annotations
 
 import pytest
-
-from sqlalchemy import select
-
 from app.models import Episode
+from sqlalchemy import select
 
 
 @pytest.fixture()
@@ -125,7 +123,6 @@ def test_cannot_assign_to_delivered_request(client, login, prepared_request):
         b"episode_id,robot_id,task_name,recorded_at,duration_seconds,operator_name,quality\n"
         b"EP-70004,arm-01,pick cup,2026-08-01T13:00:00,60,Aline,good\n"
     )
-    from app.routers.episodes import import_csv_bytes
 
     # import via the same session so the new episode is visible
     from app.deps import get_db  # noqa: F401

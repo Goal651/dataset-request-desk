@@ -8,8 +8,6 @@ from pathlib import Path
 
 from fastapi.testclient import TestClient
 
-from app.routers.episodes import import_csv_bytes
-
 SEED_CSV = Path(
     os.environ.get("SEED_CSV_PATH", Path(__file__).resolve().parents[2] / "seed" / "episodes.csv")
 )
@@ -33,7 +31,9 @@ def test_import_of_messy_seed_file_reports_clearly(client, login):
     assert report["rows_seen"] > 150
     assert report["imported"] + report["updated"] + report["skipped"] == report["rows_seen"]
     assert report["skipped"] > 0
-    skipped_reasons = " | ".join(r["reason"] or "" for r in report["rows"] if r["action"] == "skipped")
+    skipped_reasons = " | ".join(
+        r["reason"] or "" for r in report["rows"] if r["action"] == "skipped"
+    )
     assert "unknown robot_id" in skipped_reasons          # arm-99
     assert "unparseable recorded_at" in skipped_reasons    # 'not a date'
     assert "invalid duration_seconds" in skipped_reasons   # 45.5 / -5 / 999999 / N/A
