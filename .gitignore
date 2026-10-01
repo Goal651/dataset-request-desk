@@ -21,6 +21,9 @@ frontend/dist/
 .idea/
 .DS_Store
 
+# Tooling state
+.freebuff/
+
 # Local scratch
 episodes_large.csv
 *.log
