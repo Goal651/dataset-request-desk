@@ -19,7 +19,9 @@ from app.security import hash_password
 
 settings = get_settings()
 TEST_DB_URL = settings.test_database_url
-SEED_CSV = Path(__file__).resolve().parents[2] / "seed" / "episodes.csv"
+SEED_CSV = Path(
+    os.environ.get("SEED_CSV_PATH", Path(__file__).resolve().parents[2] / "seed" / "episodes.csv")
+)
 
 SEED_USERS: dict[str, tuple[str, Role, str, str | None]] = {
     "admin@example.com": ("admin123", Role.admin, "Ada Admin", "DroneBase"),

@@ -3,13 +3,16 @@
 from __future__ import annotations
 
 import io
+import os
 from pathlib import Path
 
 from fastapi.testclient import TestClient
 
 from app.routers.episodes import import_csv_bytes
 
-SEED_CSV = Path(__file__).resolve().parents[2] / "seed" / "episodes.csv"
+SEED_CSV = Path(
+    os.environ.get("SEED_CSV_PATH", Path(__file__).resolve().parents[2] / "seed" / "episodes.csv")
+)
 
 
 def _upload(client: TestClient, headers: dict, content: bytes):

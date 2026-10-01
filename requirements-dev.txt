@@ -1,4 +1,1 @@
--r requirements.txt
-pytest>=8.2,<9
-httpx>=0.27,<1
-ruff>=0.4,<1
+-r backend/requirements-dev.txt
